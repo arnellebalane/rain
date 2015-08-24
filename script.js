@@ -8,7 +8,7 @@ var drops = [];
 
 setInterval(drawRain, 30);
 
-generateDrops(75);
+generateDrops(100);
 
 function generateDrops(rainCount) {
 	for (var i = 0; i < rainCount; i++) {
@@ -24,7 +24,7 @@ function drawRain() {
 }
 
 function clearCanvas() {
-	context.fillStyle = "#001610";
+	context.fillStyle = "#0c0c00";
 	context.fillRect(0, 0, canvas.width, canvas.height);
 }
 
@@ -56,7 +56,7 @@ function Drop() {
 		context.lineTo(this.x, this.lowerPoint);
 		context.moveTo(this.x, this.upperPoint-100);
 		context.lineTo(this.x, this.upperPoint-75);
-		context.strokeStyle = "#aaaaaa";
+		context.strokeStyle = "#000000";
 		context.stroke();
 
 		return this;
