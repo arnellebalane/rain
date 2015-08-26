@@ -57,7 +57,7 @@ function Drop() {
 		context.lineTo(this.x, this.lowerPoint);
 		context.moveTo(this.x, this.upperPoint-100);
 		context.lineTo(this.x, this.upperPoint-75);
-		context.strokeStyle = "#000000";
+		context.strokeStyle = "#101000";
 		context.stroke();
 
 		return this;
@@ -92,8 +92,8 @@ function drawLight() {
 	context.lineTo(600, canvas.height - 100);
 	context.lineTo(150, canvas.height - 150);
 	context.lineTo(-50, canvas.height - 250);
-	context.fillStyle = "#131300";
-	context.strokeStyle = "#131300";
+	context.fillStyle = "#141400";
+	context.strokeStyle = "#141400";
 	context.closePath();
 	context.fill();
 	context.stroke();
@@ -106,11 +106,31 @@ function drawLight() {
 	context.lineTo(875, 250);
 	context.lineTo(800, 350);
 	context.lineTo(600, 450);
-	context.lineTo(400, 500);
-	context.lineTo(100, 450);
-	context.lineTo(0, 350);
-	context.fillStyle = "#171700";
-	context.strokeStyle = "#171700";
+	context.lineTo(400, 475);
+	context.lineTo(175, 425);
+	context.lineTo(75, 350);
+	context.lineTo(25, 150);
+	context.lineTo(75, 50);
+	context.lineTo(200, 0);
+	context.fillStyle = "#191900";
+	context.strokeStyle = "#191900";
+	context.closePath();
+	context.fill();
+	context.stroke();	
+
+	context.beginPath();
+	context.moveTo(475, 25);
+	context.lineTo(625, 50);
+	context.lineTo(705, 150);
+	context.lineTo(675, 250);
+	context.lineTo(525, 300);
+	context.lineTo(450, 300);
+	context.lineTo(280, 290);
+	context.lineTo(160, 240);
+	context.lineTo(120, 160);
+	context.lineTo(200, 50);
+	context.fillStyle = "#1e1e00";
+	context.strokeStyle = "#1e1e00";
 	context.closePath();
 	context.fill();
 	context.stroke();	
