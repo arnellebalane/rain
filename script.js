@@ -20,17 +20,17 @@ function generateDrops(rainCount) {
 function drawWorld() {
 	clearCanvas();
 	drawLight();
-	for (var i = 0; i < drops.length; i++) {
-		drops[i].update().draw();
-	};
 	if (isLightning) {
 		drawLightning();
 		isLightning = false
 	};
-	if (randomBetween(1,40) == 1) {
+	if (randomBetween(1,50) == 1) {
 		context.fillStyle = "#ffffff";
 		context.fillRect(0, 0, canvas.width, canvas.height);
 		isLightning = true;
+	};
+	for (var i = 0; i < drops.length; i++) {
+		drops[i].update().draw();
 	};
 	drawPole();
 }
@@ -218,14 +218,14 @@ function drawLightning() {
 	};
 	if (this.type == 2) {
 		context.beginPath();
-		context.moveTo(randomBetween(canvas.height/2, canvas.width), 0);
-		context.lineTo(randomBetween(canvas.height/2, canvas.width), 100);
-		context.lineTo(randomBetween(canvas.height/2, canvas.width), 200);
-		context.lineTo(randomBetween(canvas.height/2, canvas.width), 250);
-		context.lineTo(randomBetween(canvas.height/2, canvas.width), 300);
-		context.lineTo(randomBetween(canvas.height/2, canvas.width), 350);
-		context.lineTo(randomBetween(canvas.height/2, canvas.width), 400);
-		context.lineTo(randomBetween(canvas.height/2, canvas.width), randomBetween(400, 600));
+		context.moveTo(randomBetween(canvas.width/2, canvas.width), 0);
+		context.lineTo(randomBetween(canvas.width/2, canvas.width), 100);
+		context.lineTo(randomBetween(canvas.width/2, canvas.width), 200);
+		context.lineTo(randomBetween(canvas.width/2, canvas.width), 250);
+		context.lineTo(randomBetween(canvas.width/2, canvas.width), 300);
+		context.lineTo(randomBetween(canvas.width/2, canvas.width), 350);
+		context.lineTo(randomBetween(canvas.width/2, canvas.width), 400);
+		context.lineTo(randomBetween(canvas.width/2, canvas.width), randomBetween(400, 600));
 		context.strokeStyle = "#aaaa77";
 		context.stroke();
 	};
