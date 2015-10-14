@@ -6,10 +6,16 @@ canvas.height = window.innerHeight;
 
 var isLightning = false;
 var drops = [];
+var isLight = true;
 
 setInterval(drawWorld, 30);
 
-generateDrops(100);
+generateDrops(200);
+
+var mousePress = function(event) {
+    isLight = !isLight;
+}
+canvas.addEventListener("click", mousePress);
 
 function generateDrops(rainCount) {
 	for (var i = 0; i < rainCount; i++) {
@@ -19,7 +25,12 @@ function generateDrops(rainCount) {
 
 function drawWorld() {
 	clearCanvas();
-	drawLight();
+	if (isLight && randomBetween(1,50) != 1) {
+		drawLight();
+	};
+	if (!isLight && randomBetween(1,50) == 1) {
+		drawLight();
+	};
 	if (isLightning) {
 		drawLightning();
 		isLightning = false
@@ -36,7 +47,7 @@ function drawWorld() {
 }
 
 function clearCanvas() {
-	context.fillStyle = "#0c0c00";
+	context.fillStyle = "#000000";
 	context.fillRect(0, 0, canvas.width, canvas.height);
 }
 
@@ -50,7 +61,7 @@ function Drop() {
 	this.lowerPoint = this.upperPoint + 50;
 
 	this.update = function() {
-		this.upperPoint += randomBetween(40, 55);
+		this.upperPoint += 40;
 		this.lowerPoint += 60;
 
 		if (this.upperPoint > canvas.height) {
@@ -68,7 +79,7 @@ function Drop() {
 		context.lineTo(this.x, this.lowerPoint);
 		context.moveTo(this.x, this.upperPoint-100);
 		context.lineTo(this.x, this.upperPoint-75);
-		context.strokeStyle = "#101000";
+		context.strokeStyle = "rgba(0,0,0,0.5)";
 		context.stroke();
 
 		return this;
@@ -76,14 +87,13 @@ function Drop() {
 }
 
 function drawLight() {
-
 	context.beginPath();
 	context.moveTo(450, 160);
 	context.lineTo(380, 170);
 	context.lineTo(250, canvas.height);
 	context.lineTo(1500, canvas.height);
-	context.fillStyle = "rgba( 70, 70, 0, 0.05)";
-	context.strokeStyle = "rgba( 70, 70, 0, 0.05)";
+	context.fillStyle = "rgba( 255, 255, 255, 0.25)";
+	context.strokeStyle = "rgba( 255, 255, 255, 0.25)";
 	context.closePath();
 	context.fill();
 	context.stroke();	
@@ -93,8 +103,8 @@ function drawLight() {
 	context.lineTo(380, 170);
 	context.lineTo(400, canvas.height);
 	context.lineTo(1200, canvas.height);
-	context.fillStyle = "rgba( 150, 150, 0, 0.05)";
-	context.strokeStyle = "rgba( 150, 150, 0, 0.05)";
+	context.fillStyle = "rgba( 255, 255, 255, 0.25)";
+	context.strokeStyle = "rgba( 255, 255, 255, 0.25)";
 	context.closePath();
 	context.fill();
 	context.stroke();
@@ -104,8 +114,8 @@ function drawLight() {
 	context.lineTo(380, 170);
 	context.lineTo(550, canvas.height);
 	context.lineTo(1000, canvas.height);
-	context.fillStyle = "rgba( 125, 125, 0, 0.05)";
-	context.strokeStyle = "rgba( 125, 125, 0, 0.05)";
+	context.fillStyle = "rgba( 255, 255, 255, 0.25)";
+	context.strokeStyle = "rgba( 255, 255, 255, 0.25)";
 	context.closePath();
 	context.fill();
 	context.stroke();
@@ -133,33 +143,20 @@ function drawPole() {
 }
 
 function drawLightning() {
-	this.type = randomBetween(1, 3);
-	if (this.type == 1) {
-		context.beginPath();
-		context.moveTo(randomBetween(0, canvas.width/2), 0);
-		context.lineTo(randomBetween(0, canvas.width/2), 100);
-		context.lineTo(randomBetween(0, canvas.width/2), 200);
-		context.lineTo(randomBetween(0, canvas.width/2), 250);
-		context.lineTo(randomBetween(0, canvas.width/2), 300);
-		context.lineTo(randomBetween(0, canvas.width/2), 350);
-		context.lineTo(randomBetween(0, canvas.width/2), 400);
-		context.lineTo(randomBetween(0, canvas.width/2), randomBetween(400, 600));
-		context.strokeStyle = "#aaaa77";
-		context.stroke();
-	};
-	if (this.type == 2) {
-		context.beginPath();
-		context.moveTo(randomBetween(canvas.width/2, canvas.width), 0);
-		context.lineTo(randomBetween(canvas.width/2, canvas.width), 100);
-		context.lineTo(randomBetween(canvas.width/2, canvas.width), 200);
-		context.lineTo(randomBetween(canvas.width/2, canvas.width), 250);
-		context.lineTo(randomBetween(canvas.width/2, canvas.width), 300);
-		context.lineTo(randomBetween(canvas.width/2, canvas.width), 350);
-		context.lineTo(randomBetween(canvas.width/2, canvas.width), 400);
-		context.lineTo(randomBetween(canvas.width/2, canvas.width), randomBetween(400, 600));
-		context.strokeStyle = "#aaaa77";
-		context.stroke();
-	};
+	var x = randomBetween(0,canvas.width);
+	context.beginPath();
+	context.moveTo(randomBetween(x-50, x+50), 0);
+	context.lineTo(randomBetween(x-50, x+50), 100);
+	context.lineTo(randomBetween(x-50, x+50), 200);
+	context.lineTo(randomBetween(x-100, x+100), 250);
+	context.lineTo(randomBetween(x-100, x+100), 300);
+	context.lineTo(randomBetween(x-200, x+200), 350);
+	context.lineTo(randomBetween(x-100, x+100), 400);
+	context.lineTo(randomBetween(x-50, x+50), 500);
+	context.lineTo(randomBetween(x-50, x+50), 600);
+	context.lineTo(randomBetween(x-50, x+50), 700);
+	context.strokeStyle = "#aaaa77";
+	context.stroke();
 }
 
 
