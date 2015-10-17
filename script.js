@@ -6,7 +6,7 @@ canvas.height = window.innerHeight;
 
 var isLightning = false;
 var drops = [];
-var isLight = true;
+var isLight = false;
 
 setInterval(drawWorld, 30);
 
