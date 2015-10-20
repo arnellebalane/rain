@@ -8,12 +8,21 @@ var isLightning = false;
 var drops = [];
 var isLight = false;
 
+var jap = false;
+var ghost = true;
+
 setInterval(drawWorld, 30);
 
 generateDrops(200);
 
 var mousePress = function(event) {
     isLight = !isLight;
+    if (!jap) {
+		jap = true;
+	};
+	if (ghost || !ghost) {
+		ghost = !ghost;
+	};
 }
 canvas.addEventListener("click", mousePress);
 
@@ -21,7 +30,7 @@ function generateDrops(rainCount) {
 	for (var i = 0; i < rainCount; i++) {
 		drops.push(new Drop());
 	};
-}
+}	
 
 function drawWorld() {
 	clearCanvas();
@@ -33,7 +42,7 @@ function drawWorld() {
 	};
 	if (isLightning) {
 		drawLightning();
-		isLightning = false
+		isLightning = false;
 	};
 	if (randomBetween(1,50) == 1) {
 		context.fillStyle = "#ffffff";
@@ -44,6 +53,36 @@ function drawWorld() {
 		drops[i].update().draw();
 	};
 	drawPole();
+	if (jap && ghost) {
+		drawGhost();
+	};
+}
+
+function drawGhost() {
+	// var x = canvas.width/2-50;
+	// var y = canvas.height;
+	context.beginPath();
+	context.fillStyle = "#000000";
+	context.arc(370, 400, 30, Math.PI * 2, false);
+	context.fill();
+
+	context.fillRect(350, 165, 2, 250);
+
+	context.beginPath();
+	context.fillStyle = "#000000";
+	context.moveTo(350, 420);
+	context.lineTo(339, 430);
+	context.lineTo(333, 470);
+	context.lineTo(335, 490);
+	context.lineTo(335, 580);
+	context.lineTo(330, 670);
+	context.lineTo(345, 685);
+	context.lineTo(350, 680);
+	context.lineTo(347, 670);
+	context.lineTo(340, 665);
+	context.lineTo(355, 550);
+	context.lineTo(353, 420);
+	context.fill();
 }
 
 function clearCanvas() {
