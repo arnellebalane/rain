@@ -13,7 +13,7 @@ var ghost = true;
 
 setInterval(drawWorld, 30);
 
-generateDrops(200);
+generateDrops(400);
 
 var mousePress = function(event) {
     isLight = !isLight;
@@ -105,8 +105,12 @@ function Drop() {
 
 		if (this.upperPoint > canvas.height) {
 			this.x = randomBetween(0, canvas.width);
-			this.upperPoint = -50;
-			this.lowerPoint = -10;
+			this.upperPoint = -30;
+			this.lowerPoint = 0;
+		};
+
+		if (this.lowerPoint - this.upperPoint > 200) {
+			this.upperPoint = this.lowerPoint - 200;
 		};
 
 		return this;
