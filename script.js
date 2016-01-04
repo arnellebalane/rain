@@ -11,6 +11,10 @@ var isLight = false;
 var jap = false;
 var ghost = true;
 
+var wind = 0;
+
+var counter = 0;
+
 setInterval(drawWorld, 30);
 
 generateDrops(400);
@@ -23,6 +27,7 @@ var mousePress = function(event) {
 	if (ghost || !ghost) {
 		ghost = !ghost;
 	};
+	counter++;
 }
 canvas.addEventListener("click", mousePress);
 
@@ -56,6 +61,27 @@ function drawWorld() {
 	if (jap && ghost) {
 		drawGhost();
 	};
+	randomWind();
+	if (counter == 6) {
+		SCREAM();
+	};
+}
+
+function randomWind() {
+	var x = randomBetween(0,100);
+	if (x == 0) {
+		wind++;
+	};
+	if (x == 1) {
+		wind--;
+	};
+	if (x == 2) {
+		wind = 0;
+	};
+}
+
+function SCREAM(){
+	console.log("SCREAM!!!!!");	
 }
 
 function drawGhost() {
@@ -113,6 +139,15 @@ function Drop() {
 			this.upperPoint = this.lowerPoint - 200;
 		};
 
+		this.x += wind;
+
+		if (this.x < 0) {
+			this.x = canvas.width;
+		};
+		if (this.x > canvas.width) {
+			this.x = 0;
+		};
+
 		return this;
 	}
 
@@ -122,7 +157,7 @@ function Drop() {
 		context.lineTo(this.x, this.lowerPoint);
 		context.moveTo(this.x, this.upperPoint-100);
 		context.lineTo(this.x, this.upperPoint-75);
-		context.strokeStyle = "rgba(0,0,0,0.5)";
+		context.strokeStyle = "rgba(50,50,50,0.5)";
 		context.stroke();
 
 		return this;
