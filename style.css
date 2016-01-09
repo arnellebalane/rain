@@ -11,3 +11,17 @@ html, body {
 canvas {
 	display: block;
 }
+
+.scream {
+	width: 100%;
+	height: 100%;
+	display: none;
+	position: absolute;
+}
+
+.lol {
+	width: 100%;
+	height: 100%;
+	display: block;
+	position: absolute;
+}

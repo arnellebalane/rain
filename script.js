@@ -14,6 +14,10 @@ var ghost = true;
 var wind = 0;
 
 var counter = 0;
+var picture = jQuery('.scream');
+var screamAudio = new AudioContext();
+var oscillator = screamAudio.createOscillator();
+
 
 setInterval(drawWorld, 30);
 
@@ -65,6 +69,9 @@ function drawWorld() {
 	if (counter == 6) {
 		SCREAM();
 	};
+	if (counter > 6) {
+		oscillator.stop();
+	};
 }
 
 function randomWind() {
@@ -81,7 +88,10 @@ function randomWind() {
 }
 
 function SCREAM(){
-	console.log("SCREAM!!!!!");	
+	picture.toggleClass('scream lol');
+	oscillator.frequency.value = 1000;
+	oscillator.connect(screamAudio.destination);
+	oscillator.start(0);
 }
 
 function drawGhost() {
