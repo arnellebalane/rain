@@ -63,14 +63,14 @@ function drawWorld() {
 	};
 	drawPole();
 	if (jap && ghost) {
-		drawGhost();
+		// drawGhost();
 	};
 	randomWind();
 	if (counter == 6) {
-		SCREAM();
+		// SCREAM();
 	};
 	if (counter > 6) {
-		oscillator.stop();
+		// oscillator.stop();
 	};
 }
 
