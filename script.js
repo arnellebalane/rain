@@ -8,14 +8,12 @@ var isLightning = false;
 var drops = [];
 var isLight = false;
 var gradientBackground = context.createLinearGradient(0,0,100,canvas.height);
+var lightningX = randomBetween(0-200,canvas.width-200);
 
 /////////////////////////////////////////////////////////////////////////////
 
-gradientBackground.addColorStop(0,"white");
-gradientBackground.addColorStop(1,"#000");
-
-// gradientBackground.addColorStop(0,"white");
-// gradientBackground.addColorStop(1,"grey");
+gradientBackground.addColorStop(0,"#000");
+gradientBackground.addColorStop(1,"#333");
 
 generateDrops(800);
 
@@ -47,7 +45,7 @@ function world() {
 		drawLight();
 	};
 
-	if (randomBetween(1,5) == 1) {
+	if (randomBetween(1,10) == 1) {
 		isLightning = true;
 	};
 	if (isLightning) {
@@ -128,31 +126,23 @@ function drawPole() {
 }
 
 function drawLightning() {
-	var x = randomBetween(0,canvas.width);
+	lightningX = randomBetween(lightningX-100,lightningX+100);
+	var test = randomBetween(lightningX-50, lightningX+50);
 	context.beginPath();
 	context.lineWidth = randomBetween(1,5);
-	context.moveTo(randomBetween(x-50, x+50), 0);
-	context.lineWidth = randomBetween(1,5);
-	context.lineTo(randomBetween(x-50, x+50), 100);
-	context.lineWidth = randomBetween(1,5);
-	context.lineTo(randomBetween(x-50, x+50), 200);
-	context.lineWidth = randomBetween(1,5);
-	context.lineTo(randomBetween(x-100, x+100), 250);
-	context.lineWidth = randomBetween(1,5);
-	context.lineTo(randomBetween(x-100, x+100), 300);
-	context.lineWidth = randomBetween(1,5);
-	context.lineTo(randomBetween(x-200, x+200), 350);
-	context.lineWidth = randomBetween(1,5);
-	context.lineTo(randomBetween(x-100, x+100), 400);
-	context.lineWidth = randomBetween(1,5);
-	context.lineTo(randomBetween(x-50, x+50), 500);
-	context.lineWidth = randomBetween(1,5);
-	context.lineTo(randomBetween(x-50, x+50), 600);
-	context.lineWidth = randomBetween(1,5);
-	context.lineTo(randomBetween(x-50, x+50), 700);
-	context.strokeStyle = "#000";
+	context.moveTo(test, 0);context.lineTo(test, 100);
+	test = randomBetween(test-50, test+50);context.lineTo(test, 200);
+	test = randomBetween(test-50, test+50);context.lineTo(test, 250);
+	test = randomBetween(test-100, test+100);context.lineTo(test, 300);
+	test = randomBetween(test-100, test+100);context.lineTo(test, 350);
+	test = randomBetween(test-200, test+200);context.lineTo(test, 400);
+	test = randomBetween(test-100, test+100);context.lineTo(test, 500);
+	test = randomBetween(test-50, test+50);context.lineTo(test, 600);
+	test = randomBetween(test-50, test+50);context.lineTo(test, 700);
+	test = randomBetween(test-50, test+50);context.lineTo(test, canvas.height);
+	test = randomBetween(test-50, test+50);context.strokeStyle = "#fff";
 	context.stroke();
-	flash();
+	// flash();
 	context.lineWidth = 1;
 }
 
