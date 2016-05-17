@@ -13,6 +13,7 @@ var lightningX = randomBetween(0-200,canvas.width-200);
 /////////////////////////////////////////////////////////////////////////////
 
 gradientBackground.addColorStop(0,"#000");
+// gradientBackground.addColorStop(0.8,"#000");
 gradientBackground.addColorStop(1,"#333");
 
 generateDrops(800);
@@ -45,7 +46,7 @@ function world() {
 		drawLight();
 	};
 
-	if (randomBetween(1,10) == 1) {
+	if (randomBetween(1,5) == 1) {
 		isLightning = true;
 	};
 	if (isLightning) {
@@ -81,30 +82,31 @@ function drawLight() {
 	context.lineTo(380, 180);
 	context.lineTo(250, canvas.height);
 	context.lineTo(1500, canvas.height);
-	context.fillStyle = "rgba(0,0,0,0.35)";
+	context.fillStyle = "rgba(255,255,255,0.15)";
 	context.closePath();
 	context.fill();
-
 	context.beginPath();
 	context.moveTo(450, 160);
 	context.lineTo(380, 180);
 	context.lineTo(400, canvas.height);
 	context.lineTo(1200, canvas.height);
-	context.fillStyle = "rgba(0,0,0,0.35)";
+	context.fillStyle = "rgba(255,255,255,0.05)";
 	context.closePath();
 	context.fill();
-
 	context.beginPath();
 	context.moveTo(450, 160);
 	context.lineTo(380, 180);
 	context.lineTo(550, canvas.height);
 	context.lineTo(1000, canvas.height);
-	context.fillStyle = "rgba(0,0,0,0.35)";
+	context.fillStyle = "rgba(255,255,255,0.05)";
 	context.closePath();
 	context.fill();
 }
 
 function drawPole() {
+	context.shadowBlur = 15;
+	context.shadowColor = "#444";
+
 	context.beginPath();
 	context.moveTo(300, canvas.height);
 	context.lineTo(320, canvas.height);
@@ -123,13 +125,21 @@ function drawPole() {
 	context.closePath();
 	context.fill();
 	context.stroke();
+
+	context.shadowBlur = 0;
 }
 
 function drawLightning() {
-	lightningX = randomBetween(lightningX-100,lightningX+100);
-	var test = randomBetween(lightningX-50, lightningX+50);
-	context.beginPath();
+	context.shadowBlur = 50;
+	context.shadowColor = "#fff";
 	context.lineWidth = randomBetween(1,5);
+	
+	lightningX = randomBetween(lightningX-100,lightningX+100);
+	if (lightningX < 0 - 200 || lightningX > canvas.width + 200) {
+		lightningX = canvas.width/2;
+	}
+	var test = randomBetween(lightningX-150, lightningX+150);
+	context.beginPath();
 	context.moveTo(test, 0);context.lineTo(test, 100);
 	test = randomBetween(test-50, test+50);context.lineTo(test, 200);
 	test = randomBetween(test-50, test+50);context.lineTo(test, 250);
@@ -140,10 +150,17 @@ function drawLightning() {
 	test = randomBetween(test-50, test+50);context.lineTo(test, 600);
 	test = randomBetween(test-50, test+50);context.lineTo(test, 700);
 	test = randomBetween(test-50, test+50);context.lineTo(test, canvas.height);
-	test = randomBetween(test-50, test+50);context.strokeStyle = "#fff";
+	context.strokeStyle = "#fff";
 	context.stroke();
-	// flash();
+
+	context.shadowBlur = 0;
 	context.lineWidth = 1;
+
+	// flash();
+}
+
+function drawPerson() {
+
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -155,7 +172,7 @@ function Drop() {
 
 	this.update = function() {
 		this.upperPoint += 25;
-		this.lowerPoint += 25;
+		this.lowerPoint += 75;
 
 		if (this.upperPoint > canvas.height) {
 			this.x = randomBetween(0, canvas.width);
