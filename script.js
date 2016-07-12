@@ -155,8 +155,6 @@ function drawLightning() {
 
 	context.shadowBlur = 0;
 	context.lineWidth = 1;
-
-	// flash();
 }
 
 function drawPerson() {
