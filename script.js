@@ -46,7 +46,7 @@ function world() {
 		drawLight();
 	};
 
-	if (randomBetween(1,5) == 1) {
+	if (randomBetween(1,200) == 1) {
 		isLightning = true;
 	};
 	if (isLightning) {
