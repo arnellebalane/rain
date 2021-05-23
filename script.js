@@ -1,219 +1,156 @@
-var canvas = document.getElementById("rain");
-var context = canvas.getContext("2d");
+window.requestAnimFrame = (function () {
+  return window.requestAnimationFrame
+    || window.webkitRequestAnimationFrame
+    || window.mozRequestAnimationFrame
+    || window.oRequestAnimationFrame
+    || window.msRequestAnimationFrame
+    || function (callback) { window.setTimeout(callback, 1000 / 60) };
+})();
 
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+let particles = [];
+let particleCount = 30000;
+let canvas = document.getElementById('canvas');
+let context = canvas.getContext('2d');
+canvas.height = document.body.offsetHeight;
+canvas.width = document.body.offsetWidth;
 
-var isLightning = false;
-var drops = [];
-var isLight = false;
-var gradientBackground = context.createLinearGradient(0,0,100,canvas.height);
-var lightningX = randomBetween(0-200,canvas.width-200);
+let trees = [];
+for (let x = 0; x <= canvas.width; x += 200) {
+  trees.push(new Tree(x));
+};
+function Tree(x) {
+  let tree1 = new Image();
+  let tree2 = new Image();
+  tree1.src = 'tree1.png';
+  tree2.src = 'tree2.png';
+  this.x = x;
+  this.treeImage = Math.random() > 0.5 ? tree1 : tree2;
+  this.draw = () => {
+    context.drawImage(this.treeImage, x - this.treeImage.width / 2, canvas.height - this.treeImage.height + 20);
+  };
+};
 
-/////////////////////////////////////////////////////////////////////////////
+let umbrella = new function () {
+  this.x = canvas.width / 2;
+  this.y = canvas.height / 1.5;
+  this.radius = 50;
+  context.strokeStyle = 'white';
+  context.fillStyle = 'rgba(255, 255, 255, 0.2)';
+  this.draw = () => {
+    let gap = (this.radius * 2) / 9;
+    let halfGap = gap / 2;
 
-gradientBackground.addColorStop(0,"#000");
-// gradientBackground.addColorStop(0.8,"#000");
-gradientBackground.addColorStop(1,"#333");
+    context.beginPath(); // main
+    context.arc(this.x, this.y, this.radius, Math.PI * 2, Math.PI, true);
+    for (let i = this.x - this.radius; i < this.x + this.radius - 1; i += gap) {
+      context.arc(i + halfGap, this.y, halfGap, Math.PI, Math.PI * 2);
+    }
+    context.fill();
+    context.stroke();
 
-generateDrops(800);
+    context.beginPath(); // stick
+    context.moveTo(this.x, this.y - halfGap);
+    context.lineTo(this.x, this.y + this.radius);
+    context.stroke();
 
-setInterval(world, 30);
+    context.beginPath(); // handle
+    context.arc(this.x - halfGap, this.y + this.radius, halfGap, 0, Math.PI);
+    context.stroke();
 
-/////////////////////////////////////////////////////////////////////////////
+    context.beginPath(); // top
+    context.arc(this.x, this.y - this.radius - halfGap, halfGap / 2, Math.PI * 2, false);
+    context.stroke();
+  };
+};
 
-var mousePress = function(event) {
-    isLight = !isLight;
+canvas.addEventListener('mousemove', (event) => {
+  umbrella.x = event.x;
+  umbrella.y = event.y;
+  if (umbrella.y - umbrella.radius < 0) {
+    umbrella.y = umbrella.radius;
+  } else if (umbrella.y + umbrella.radius > canvas.height) {
+    umbrella.y = canvas.height - umbrella.radius;
+  }
+  if (umbrella.x - umbrella.radius < 0) {
+    umbrella.x = umbrella.radius;
+  } else if (umbrella.x + umbrella.radius > canvas.width) {
+    umbrella.x = canvas.width - umbrella.radius;
+  }
+});
+
+function getHypothenuse(p1, p2) {
+  let x = Math.abs(p1.x - p2.x);
+  let y = Math.abs(p1.y - p2.y);
+  return Math.sqrt((x * x) + (y * y));
+};
+
+for (let i = 0; i < particleCount; i++) {
+  particles.push(new Particle());
 }
-canvas.addEventListener("click", mousePress);
-
-function generateDrops(rainCount) {
-	for (var i = 0; i < rainCount; i++) {
-		drops.push(new Drop());
-	};
-}
-
-/////////////////////////////////////////////////////////////////////////////
-
-function world() {
-	clearCanvas();
-	drawPole();
-
-	if (isLight && randomBetween(1,50) != 1) {
-		drawLight();
-	};
-	if (!isLight && randomBetween(1,50) == 1) {
-		drawLight();
-	};
-
-	if (randomBetween(1,200) == 1) {
-		isLightning = true;
-	};
-	if (isLightning) {
-		drawLightning();
-		isLightning = false;
-	};
-
-	for (var i = 0; i < drops.length; i++) {
-		drops[i].update().draw();
-	};}
-
-/////////////////////////////////////////////////////////////////////////////
+function Particle() {
+  this.x = Math.random() * canvas.width;
+  this.y = Math.random() * canvas.height;
+  this.depth = (Math.random() * 10 + 1) | 0;
+  this.size = this.depth * 0.1;
+  this.vy = (this.depth * .25) + 1 / Math.random();
+  this.vx = -1;
+  this.show = true;
+  this.update = () => {
+    if (
+      this.depth > 1 &&
+      this.x > (umbrella.x - umbrella.radius) &&
+      this.x < (umbrella.x + umbrella.radius)
+    ) {
+      if (getHypothenuse(this, umbrella) <= umbrella.radius) {
+        this.show = false;
+      }
+    }
+    if (this.y > canvas.height) {
+      this.y = 0 - this.size;
+      this.show = true;
+    }
+    if (this.x + this.size <= 0) {
+      this.x = canvas.width;
+    }
+    this.y += this.vy;
+    this.x += this.vx;
+  };
+  this.drawToImageData = (imageData) => {
+    if (this.show) {
+      for (let w = 0; w < this.size; w++) {
+        for (let h = 0; h < this.size; h++) {
+          let pData = (~~(this.x + w) + (~~(this.y + h) * canvas.width)) * 4;
+          imageData.data[pData] = 255;
+          imageData.data[pData + 1] = 255;
+          imageData.data[pData + 2] = 255;
+          imageData.data[pData + 3] = 255;
+        }
+      }
+    }
+  };
+};
 
 function clearCanvas() {
-	context.fillStyle = gradientBackground;
-	context.fillRect(0, 0, canvas.width, canvas.height);
-}
+  context.fillStyle = 'black';
+  context.fillRect(0, 0, canvas.width, canvas.height);
+};
 
-function randomBetween(min, max) {
-	return Math.floor(Math.random() * (max - min)) + min;
-}
+function drawTrees() {
+  for (let tree of trees) {
+    tree.draw();
+  }
+};
 
-/////////////////////////////////////////////////////////////////////////////
-
-function flash() {
-	context.fillStyle = "rgba(0,0,0,0.7)";
-	context.fillRect(0, 0, canvas.width, canvas.height);
-}
-
-function drawLight() {
-	context.beginPath();
-	context.moveTo(450, 160);
-	context.lineTo(380, 180);
-	context.lineTo(250, canvas.height);
-	context.lineTo(1500, canvas.height);
-	context.fillStyle = "rgba(255,255,255,0.15)";
-	context.closePath();
-	context.fill();
-	context.beginPath();
-	context.moveTo(450, 160);
-	context.lineTo(380, 180);
-	context.lineTo(400, canvas.height);
-	context.lineTo(1200, canvas.height);
-	context.fillStyle = "rgba(255,255,255,0.05)";
-	context.closePath();
-	context.fill();
-	context.beginPath();
-	context.moveTo(450, 160);
-	context.lineTo(380, 180);
-	context.lineTo(550, canvas.height);
-	context.lineTo(1000, canvas.height);
-	context.fillStyle = "rgba(255,255,255,0.05)";
-	context.closePath();
-	context.fill();
-}
-
-function drawPole() {
-	context.shadowBlur = 15;
-	context.shadowColor = "#444";
-
-	context.beginPath();
-	context.moveTo(300, canvas.height);
-	context.lineTo(320, canvas.height);
-	context.lineTo(330, 400);
-	context.lineTo(325, 100);
-	context.lineTo(300, 110);
-	context.lineTo(310, 400);
-	context.moveTo(310,180);
-	context.lineTo(400, 150);
-	context.lineTo(310, 170);
-	context.moveTo(400, 155);
-	context.lineTo(350, 190);
-	context.lineTo(500, 150);
-	context.fillStyle = "#000";
-	context.strokeStyle = "#000";
-	context.closePath();
-	context.fill();
-	context.stroke();
-
-	context.shadowBlur = 0;
-}
-
-function drawLightning() {
-	context.shadowBlur = 50;
-	context.shadowColor = "#fff";
-	context.lineWidth = randomBetween(1,5);
-	
-	lightningX = randomBetween(lightningX-100,lightningX+100);
-	if (lightningX < 0 - 200 || lightningX > canvas.width + 200) {
-		lightningX = canvas.width/2;
-	}
-	var test = randomBetween(lightningX-150, lightningX+150);
-	context.beginPath();
-	context.moveTo(test, 0);context.lineTo(test, 100);
-	test = randomBetween(test-50, test+50);context.lineTo(test, 200);
-	test = randomBetween(test-50, test+50);context.lineTo(test, 250);
-	test = randomBetween(test-100, test+100);context.lineTo(test, 300);
-	test = randomBetween(test-100, test+100);context.lineTo(test, 350);
-	test = randomBetween(test-200, test+200);context.lineTo(test, 400);
-	test = randomBetween(test-100, test+100);context.lineTo(test, 500);
-	test = randomBetween(test-50, test+50);context.lineTo(test, 600);
-	test = randomBetween(test-50, test+50);context.lineTo(test, 700);
-	test = randomBetween(test-50, test+50);context.lineTo(test, canvas.height);
-	context.strokeStyle = "#fff";
-	context.stroke();
-
-	context.shadowBlur = 0;
-	context.lineWidth = 1;
-}
-
-function drawPerson() {
-
-}
-
-/////////////////////////////////////////////////////////////////////////////
-
-function Drop() {
-	this.x = randomBetween(0,canvas.width);
-	this.upperPoint = randomBetween(0, canvas.height);
-	this.lowerPoint = this.upperPoint + 10;
-
-	this.update = function() {
-		this.upperPoint += 25;
-		this.lowerPoint += 75;
-
-		if (this.upperPoint > canvas.height) {
-			this.x = randomBetween(0, canvas.width);
-			this.upperPoint = -30;
-			this.lowerPoint = 0;
-		};
-
-		if (this.x < 0) {
-			this.x = canvas.width;
-		};
-		if (this.x > canvas.width) {
-			this.x = 0;
-		};
-
-		return this;
-	}
-
-	this.draw = function() {
-		context.beginPath();
-		context.moveTo(this.x, this.upperPoint);
-		context.lineTo(this.x, this.lowerPoint);
-		context.moveTo(this.x, this.upperPoint-100);
-		context.lineTo(this.x, this.upperPoint-75);
-		context.strokeStyle = "rgba(250,250,250,0.1)";
-		context.stroke();
-
-		return this;
-	}
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+loop();
+function loop() {
+  requestAnimFrame(loop.bind(this));
+  clearCanvas();
+  drawTrees();
+  let imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+  for (let particle of particles) {
+    particle.update();
+    particle.drawToImageData(imageData);
+  }
+  context.putImageData(imageData, 0, 0);
+  umbrella.draw();
+};
