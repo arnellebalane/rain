@@ -51,6 +51,7 @@
 
   let particles = [];
   let trees = [];
+  let trees1 = [];
   let lightnings = [];
   initialize();
   function initialize() {
@@ -62,6 +63,9 @@
 
     trees = [];
     generateTrees();
+
+    trees1 = [];
+    generateTrees1();
 
     lightnings = [];
     // generateLightning();
@@ -76,13 +80,25 @@
   };
 
   function generateTrees() {
-    for (let i = 0; i < 150; i++) {
+    for (let i = 0; i < 50; i++) {
       trees.push(new Tree(tree1, -1));
     };
-    for (let i = 0; i < 30; i++) {
+    for (let i = 0; i < 50; i++) {
       trees.push(new Tree(tree2, -1));
     };
     trees.sort((a, b) => {
+      return a.height < b.height ? 1 : -1;
+    });
+  };
+
+  function generateTrees1() {
+    for (let i = 0; i < 30; i++) {
+      trees1.push(new Tree(tree1, -1.5, true));
+    };
+    for (let i = 0; i < 30; i++) {
+      trees1.push(new Tree(tree2, -1.5, true));
+    };
+    trees1.sort((a, b) => {
       return a.height < b.height ? 1 : -1;
     });
   };
@@ -118,6 +134,13 @@
     }
   };
 
+  function drawTrees1() {
+    for (let tree of trees1) {
+      tree.update();
+      tree.draw();
+    }
+  };
+
   function drawParticless() {
     let imageData = context.getImageData(0, 0, canvas.width, canvas.height);
     for (let particle of particles) {
@@ -135,10 +158,6 @@
     context.stroke();
   };
 
-  function drawClouds() {
-    
-  };
-
   function drawMonster() {
     let scale = 1.5;
     let w = monster.width * scale;
@@ -149,7 +168,7 @@
     let eyeY = canvas.height - h + 20;
     context.fillStyle = "gold";
     context.beginPath();
-    context.arc(eyeX, eyeY, 7, Math.PI * 1.9, Math.PI * 0.95);
+    context.arc(eyeX, eyeY, 5, Math.PI * 1.9, Math.PI * 0.95);
     context.fill();
   };
 
@@ -183,8 +202,8 @@
     drawBottomLine();
     drawLightnings();
     drawLightningsFlash();
+    drawTrees1();
     drawMonster();
-    // drawClouds();
     drawTrees();
     drawLightningsFlash();
     drawParticless();
@@ -245,9 +264,9 @@
     };
   };
 
-  function Tree(image, speed) {
+  function Tree(image, speed, one) {
     this.image = image;
-    this.scale = Math.random() + 0.1;
+    this.scale = Math.random() + 0.1 * (one ? 3 : 1);
     this.width = image.width * this.scale;
     this.height = image.height * this.scale;
     this.speed = speed * this.scale / 2;
