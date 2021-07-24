@@ -269,7 +269,7 @@
     this.update = () => {
       for (let node of this.nodes) {
         if (node.lineWidth > 0.1) {
-          node.lineWidth *= 0.7;
+          node.lineWidth *= 0.8;
         }
       }
       if (!this.nodes.length || this.nodes[0].lineWidth <= 0.1) {
