@@ -40,6 +40,7 @@
 
   ////////////////////////////////////////////////////////////////////////////////
 
+  let wind = -2;
   let particles = [];
   let trees = [];
   let lightnings = [];
@@ -182,7 +183,7 @@
     this.depth = (Math.random() * 10 + 1) | 0;
     this.size = this.depth * 0.1;
     this.speedy = (this.depth * .25) + 1 / Math.random();
-    this.speedx = 0;
+    this.speedx = wind;
     this.highlight = false;
     this.update = () => {
       this.y += this.speedy;
@@ -191,7 +192,9 @@
         this.y = 0 - this.size;
       }
       if (this.x + this.size <= 0) {
-        this.x = canvas.width;
+        this.x = canvas.width - Math.abs(this.x);
+      } else if (this.x - this.size >= canvas.width) {
+        this.x = 0 + (this.x - canvas.width);
       }
       this.highlight = false;
       // if (randomBetween(this.y, canvas.height) <= this.y + 3) {
@@ -234,10 +237,12 @@
       }
     };
     this.draw = () => {
+      let x = this.x - this.width / 2 + 50;
+      let y = this.y;
       context.drawImage(
         image,
-        this.x - this.width / 2,
-        this.y,
+        x,
+        y,
         this.width,
         this.height
       );
