@@ -40,11 +40,11 @@
 
   ////////////////////////////////////////////////////////////////////////////////
 
-  let wind = -2;
   let particles = [];
   let trees = [];
   let lightnings = [];
   let clouds = [];
+  let winds = [];
   initialize();
   function initialize() {
     canvas.height = document.body.offsetHeight;
@@ -61,6 +61,9 @@
 
     clouds = [];
     generateClouds();
+
+    winds = [];
+    generateWinds();
   };
 
   ////////////////////////////////////////////////////////////////////////////////
@@ -74,7 +77,7 @@
   function generateTrees() {
     for (let i = 0; i < 100; i++) {
       trees.push(new Tree(tree));
-    };
+    }
     trees.sort((a, b) => {
       return a.height < b.height ? 1 : -1;
     });
@@ -92,7 +95,13 @@
   function generateClouds() {
     for (let i = 0; i < 50; i++) {
       clouds.push(new Cloud());
-    };
+    }
+  };
+
+  function generateWinds() {
+    for (let i = 0; i < 50; i++) {
+      winds.push(new Wind());
+    }
   };
 
   function clearCanvas() {
@@ -146,7 +155,7 @@
 
   function drawLightningsFlash() {
     for (let lightning of lightnings) {
-      context.fillStyle = `rgba(255, 255, 255, 0.008)`
+      context.fillStyle = `rgba(255, 255, 255, 0.01)`
       context.beginPath();
       context.arc(lightning.x, lightning.y, 700, Math.PI * 2, false);
       context.fill();
@@ -156,6 +165,13 @@
   function drawClouds() {
     for (let cloud of clouds) {
       cloud.draw();
+    }
+  };
+
+  function drawWinds() {
+    for (let wind of winds) {
+      wind.update();
+      wind.draw();
     }
   };
 
@@ -171,6 +187,7 @@
       drawLightningsFlash();
       drawClouds();
       drawTrees();
+      drawWinds();
       drawParticless();
     }
   };
@@ -183,23 +200,38 @@
     this.depth = (Math.random() * 10 + 1) | 0;
     this.size = this.depth * 0.1;
     this.speedy = (this.depth * .25) + 1 / Math.random();
-    this.speedx = wind;
+    this.speedx = -3;
     this.highlight = false;
     this.update = () => {
       this.y += this.speedy;
       this.x += this.speedx;
+
+      for (let wind of winds) {
+        let hyp = getHypothenuse(this, wind);
+        if (hyp <= wind.r && hyp > 50) {
+          this.x += wind.speedx / (hyp / 100);
+          this.y += wind.speedy / (hyp / 100);
+          break;
+        }
+      }
+
       if (this.y > canvas.height) {
         this.y = 0 - this.size;
+        // this.x = Math.random() * canvas.width;
       }
       if (this.x + this.size <= 0) {
         this.x = canvas.width - Math.abs(this.x);
       } else if (this.x - this.size >= canvas.width) {
         this.x = 0 + (this.x - canvas.width);
       }
+
       this.highlight = false;
       // if (randomBetween(this.y, canvas.height) <= this.y + 3) {
       //   this.highlight = true;
       // }
+      if (randomBetween(0, 1000) == 0) {
+        this.highlight = true;
+      }
     };
     this.draw = (imageData) => {
       for (let w = 0; w < this.size; w++) {
@@ -337,6 +369,34 @@
         context.arc(subcloud.x, subcloud.y, subcloud.radius, Math.PI * 2, 0);
         context.fill();
       }
+    };
+  };
+
+  function Wind() {
+    this.x = randomBetween(0, canvas.width);
+    this.y = randomBetween(0, canvas.height);
+    this.r = 150;
+    this.speedx = randomBetween(-10, 10) * 0.1;
+    this.speedy = randomBetween(-10, 10) * 0.1;
+    this.update = () => {
+      this.x += this.speedx;
+      this.y += this.speedy;
+      if (this.x + this.r < 0) {
+        this.x = canvas.width + this.r;
+      } else if (this.x - this.r > canvas.width) {
+        this.x = 0 - this.r;
+      }
+      if (this.y + this.r < 0) {
+        this.y = canvas.height + this.r;
+      } else if (this.y - this.r > canvas.height) {
+        this.y = 0 - this.r;
+      }
+    };
+    this.draw = () => {
+      // context.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+      // context.beginPath();
+      // context.arc(this.x, this.y, this.r, Math.PI * 2, false);
+      // context.stroke();
     };
   };
 
