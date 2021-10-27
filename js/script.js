@@ -46,7 +46,7 @@
   let lightnings = [];
   let clouds = [];
   let winds = [];
-  initialize();
+
   function initialize() {
     canvas.height = document.body.offsetHeight;
     canvas.width = document.body.offsetWidth;
@@ -65,6 +65,20 @@
 
     winds = [];
     generateWinds();
+  };
+
+  function loop() {
+    requestAnimFrame(loop.bind(this));
+    if (isTabVisible) {
+      clearCanvas();
+      drawBottomLine();
+      drawLightnings();
+      drawLightningsFlash();
+      drawClouds();
+      drawTrees();
+      drawWinds();
+      drawParticless();
+    }
   };
 
   ////////////////////////////////////////////////////////////////////////////////
@@ -177,34 +191,18 @@
     }
   };
 
-  //////////////////////////////////////////////////////////////////////////////// main loop
-
-  loop();
-  function loop() {
-    requestAnimFrame(loop.bind(this));
-    if (isTabVisible) {
-      clearCanvas();
-      drawBottomLine();
-      drawLightnings();
-      drawLightningsFlash();
-      drawClouds();
-      drawTrees();
-      drawWinds();
-      drawParticless();
-    }
-  };
-
   //////////////////////////////////////////////////////////////////////////////// objects
 
-  function Particle() {
-    this.x = Math.random() * canvas.width;
-    this.y = Math.random() * canvas.height;
-    this.depth = (Math.random() * 10 + 1) | 0;
-    this.size = this.depth * 0.1;
-    this.speedy = (this.depth * .25) + 1 / Math.random();
-    this.speedx = windSpeed;
-    this.highlight = false;
-    this.update = () => {
+  class Particle {
+    x = Math.random() * canvas.width;
+    y = Math.random() * canvas.height;
+    depth = (Math.random() * 10 + 1) | 0;
+    size = this.depth * 0.1;
+    speedy = (this.depth * .25) + 1 / Math.random();
+    speedx = windSpeed;
+    highlight = false;
+
+    update() {
       this.y += this.speedy;
       this.x += this.speedx;
 
@@ -234,8 +232,9 @@
       // if (randomBetween(0, 1000) == 0) {
       //   this.highlight = true;
       // }
-    };
-    this.draw = (imageData) => {
+    }
+
+    draw(imageData) {
       for (let w = 0; w < this.size; w++) {
         for (let h = 0; h < this.size; h++) {
           let pData = (~~(this.x + w) + (~~(this.y + h) * canvas.width)) * 4;
@@ -250,62 +249,72 @@
           imageData.data[pData + 3] = a;
         }
       }
-    };
-  };
+    }
+  }
 
-  function Tree(image) {
-    this.image = image;
-    this.scale = randomBetween(50, 100) * 0.01;
-    this.width = image.width * this.scale;
-    this.height = image.height * this.scale;
-    this.speed = 0 * (1 / this.scale);
-    this.x = randomBetween(0 - image.width / 3, canvas.width + image.width / 3);
-    this.y = canvas.height - this.height + Math.random() * 5;
-    this.update = () => {
+  class Tree {
+    scale = randomBetween(50, 100) * 0.01;
+    speed = 0 * (1 / this.scale);
+
+    constructor(image) {
+      this.image = image;
+      this.width = image.width * this.scale;
+      this.height = image.height * this.scale;
+      this.x = randomBetween(0 - image.width / 3, canvas.width + image.width / 3);
+      this.y = canvas.height - this.height + Math.random() * 5;
+    }
+
+    update() {
       this.x += this.speed;
-      if (this.x < 0 - image.width / 2) {
-        this.x = canvas.width + image.width / 2;
+      if (this.x < 0 - this.image.width / 2) {
+        this.x = canvas.width + this.image.width / 2;
       }
-      if (this.x > canvas.width + image.width / 2) {
-        this.x = 0 - image.width / 2;
+      if (this.x > canvas.width + this.image.width / 2) {
+        this.x = 0 - this.image.width / 2;
       }
-    };
-    this.draw = () => {
+    }
+
+    draw() {
       let x = this.x - this.width / 2 + 50;
       let y = this.y;
       context.drawImage(
-        image,
+        this.image,
         x,
         y,
         this.width,
         this.height
       );
-    };
-  };
+    }
+  }
 
-  function Lightning(x, y, lineWidth) {
-    this.nodes = [];
-    this.x = x;
-    this.y = y;
-    let currentX = this.x;
-    let currentY = this.y;
-    let currentLineWidth = lineWidth;
-    for (; currentY < canvas.height + 100 && currentLineWidth > 0.25;) {
-      this.nodes.push({
-        x: currentX,
-        y: currentY,
-        lineWidth: currentLineWidth,
-      });
+  class Lightning {
+    nodes = [];
 
-      currentX += randomBetween(-100, 100);
-      currentY += randomBetween(50, 150);
-      currentLineWidth *= 0.8;
+    constructor(x, y, lineWidth) {
+      this.x = x;
+      this.y = y;
 
-      if (randomBetween(0, 5) == 0) {
-        lightnings.push(new Lightning(currentX, currentY, currentLineWidth * 0.8));
+      let currentX = this.x;
+      let currentY = this.y;
+      let currentLineWidth = lineWidth;
+      for (; currentY < canvas.height + 100 && currentLineWidth > 0.25;) {
+        this.nodes.push({
+          x: currentX,
+          y: currentY,
+          lineWidth: currentLineWidth,
+        });
+
+        currentX += randomBetween(-100, 100);
+        currentY += randomBetween(50, 150);
+        currentLineWidth *= 0.8;
+
+        if (randomBetween(0, 5) == 0) {
+          lightnings.push(new Lightning(currentX, currentY, currentLineWidth * 0.8));
+        }
       }
     }
-    this.update = () => {
+
+    update() {
       for (let node of this.nodes) {
         if (node.lineWidth > 0.1) {
           node.lineWidth *= 0.8;
@@ -315,8 +324,9 @@
         let index = lightnings.indexOf(this);
         lightnings.splice(index, 1);
       }
-    };
-    this.draw = () => {
+    }
+
+    draw() {
       context.shadowColor = "white";
       context.strokeStyle = "white";
       context.fillStyle = "white";
@@ -347,25 +357,29 @@
       }
       context.lineWidth = 1;
       context.shadowBlur = 0;
-    };
-  };
-
-  function Cloud() {
-    this.x = randomBetween(-150, canvas.width + 150);
-    this.y = randomBetween(-150, canvas.height + 150);
-    this.radius = randomBetween(50, 150);
-    this.speed = windSpeed;
-    this.alpha = 0.01;
-    this.subclouds = [];
-    let subcloudsCount = 7;
-    for (let i = 0; i < subcloudsCount; i++) {
-      this.subclouds.push({
-        x: this.x + randomBetween(-150, 150),
-        y: this.y + randomBetween(-70, 70),
-        radius: this.radius * (randomBetween(80, 100) * 0.01)
-      });
     }
-    this.update = () => {
+  }
+
+  class Cloud {
+    x = randomBetween(-150, canvas.width + 150);
+    y = randomBetween(-150, canvas.height + 150);
+    radius = randomBetween(50, 150);
+    speed = windSpeed;
+    alpha = 0.01;
+    subclouds = [];
+
+    constructor() {
+      let subcloudsCount = 7;
+      for (let i = 0; i < subcloudsCount; i++) {
+        this.subclouds.push({
+          x: this.x + randomBetween(-150, 150),
+          y: this.y + randomBetween(-70, 70),
+          radius: this.radius * (randomBetween(80, 100) * 0.01)
+        });
+      }
+    }
+
+    update() {
       for (let subcloud of this.subclouds) {
         subcloud.x += this.speed;
         if (subcloud.x + subcloud.radius < 0) {
@@ -374,24 +388,26 @@
           subcloud.x = 0 - subcloud.radius;
         }
       }
-    };
-    this.draw = () => {
+    }
+
+    draw() {
       context.fillStyle = `rgba(0, 0, 0, 0.2)`;
       for (let subcloud of this.subclouds) {
         context.beginPath();
         context.arc(subcloud.x, subcloud.y, subcloud.radius, Math.PI * 2, 0);
         context.fill();
       }
-    };
-  };
+    }
+  }
 
-  function Wind() {
-    this.x = randomBetween(0, canvas.width);
-    this.y = randomBetween(0, canvas.height);
-    this.r = 150;
-    this.speedx = randomBetween(-10, 10) * 0.1;
-    this.speedy = randomBetween(-10, 10) * 0.1;
-    this.update = () => {
+  class Wind {
+    x = randomBetween(0, canvas.width);
+    y = randomBetween(0, canvas.height);
+    r = 150;
+    speedx = randomBetween(-10, 10) * 0.1;
+    speedy = randomBetween(-10, 10) * 0.1;
+
+    update() {
       this.x += this.speedx;
       this.y += this.speedy;
       if (this.x + this.r < 0) {
@@ -404,15 +420,19 @@
       } else if (this.y - this.r > canvas.height) {
         this.y = 0 - this.r;
       }
-    };
-    this.draw = () => {
+    }
+
+    draw() {
       // context.strokeStyle = 'rgba(255, 255, 255, 0.2)';
       // context.beginPath();
       // context.arc(this.x, this.y, this.r, Math.PI * 2, false);
       // context.stroke();
-    };
-  };
+    }
+  }
 
   ////////////////////////////////////////////////////////////////////////////////
+
+  initialize();
+  loop();
 
 })();
